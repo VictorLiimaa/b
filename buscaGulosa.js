@@ -26,6 +26,7 @@ class PriorityQueue {
     }
 }
 
+
 let mapaRomenia = {
     "Arad": {"Sibiu": 140, "Zerind": 75, "Timisoara": 118},
     "Zerind": {"Arad": 75, "Oradea": 71},
@@ -71,35 +72,30 @@ let heuristica = {
     "Vaslui": 199
 };
 
-function buscaAestrela(mapa, heuristica, inicio, fim) {
-    let fila = new PriorityQueue();
-    fila.enqueue([inicio], heuristica[inicio]);
+function buscaGulosa(mapa, heuristica, noInicial, noObjetivo) {
+    let filaPrioridade = new PriorityQueue();
+    filaPrioridade.enqueue(noInicial, heuristica[noInicial]);
+    let visitados = new Set();
+    let predecessores = {};
 
-    while (!fila.isEmpty()) {
-        let caminho = fila.dequeue();
-        let ultimo = caminho[caminho.length - 1];
+    while (!filaPrioridade.isEmpty()) {
+        let noAtual = filaPrioridade.dequeue();
 
-        if (ultimo === fim) {
-            return caminho;
+        if (noAtual === noObjetivo) {
+            return reconstruirCaminho(predecessores, noInicial, noObjetivo);
         }
 
-        for (let vizinho in mapa[ultimo]) {
-            if (!caminho.includes(vizinho)) {
-                let novoCaminho = caminho.slice();
-                novoCaminho.push(vizinho);
+        visitados.add(noAtual);
 
-                let g = novoCaminho.slice(0, -1).reduce((acc, cur, i) => {
-                    let prox = novoCaminho[i + 1];
-                    return acc + (mapa[cur][prox] || 0);
-                }, 0);
-                let h = heuristica[vizinho] || 0;
-                let f = g + h;
-
-                fila.enqueue(novoCaminho, f);
+        for (let vizinho in mapa[noAtual]) {
+            if (!visitados.has(vizinho)) {
+                predecessores[vizinho] = noAtual;
+                filaPrioridade.enqueue(vizinho, heuristica[vizinho]);
             }
         }
     }
+
     return null;
 }
 
-console.log(buscaAestrela(mapaRomenia, heuristica, "Sibiu", "Eforie"));
+console.log(buscaGulosa(mapaRomenia, "Arad", "Bucharest"));

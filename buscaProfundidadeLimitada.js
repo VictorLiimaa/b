@@ -1,3 +1,29 @@
+function buscaProfundidadeLimitada(map, start, goal, limit, path = [], visited = new Set()) {
+    path.push(start);
+    visited.add(start);
+
+    if (start === goal) {
+        return path; 
+    }
+
+    if (limit === 0) {
+        return null; 
+    }
+
+    let neighbors = map[start];
+    for (let neighbor in neighbors) {
+        if (!visited.has(neighbor)) {
+            let result = buscaProfundidadeLimitada(map, neighbor, goal, limit - 1, path, visited);
+            if (result) {
+                return result;
+            }
+        }
+    }
+
+    path.pop(); 
+    visited.delete(start); 
+    return null; 
+}
 let mapaRomenia = {
     "Arad": {"Sibiu": 140, "Zerind": 75, "Timisoara": 118},
     "Zerind": {"Arad": 75, "Oradea": 71},
@@ -21,23 +47,9 @@ let mapaRomenia = {
     "Neamt": {"Iasi": 87}
 };
 
-function buscaProfundidade(mapa, inicio, fim){
-    let pilha = [];
-    let caminho = [];
-    pilha.push([inicio]);
-    while(pilha.length > 0){
-        let cidade = pilha.pop();
-        caminho.push(cidade);
-        if (cidade == fim){
-            return caminho;
-        }
-        for (let vizinho in mapa[cidade]){
-            if (caminho.indexOf(vizinho) === -1){
-                pilha.push(vizinho);
-            }
-        }
-    }
-    return null;
+let result = buscaProfundidadeLimitada(mapaRomenia, "Arad", "Bucharest", 5);
+if (result) {
+    console.log("Caminho encontrado:", result.join(" -> "));
+} else {
+    console.log("Nenhum caminho encontrado dentro do limite de profundidade.");
 }
-
-console.log(buscaProfundidade(mapaRomenia, "Arad", "Bucharest"));
